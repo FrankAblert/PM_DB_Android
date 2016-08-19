@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">PM_DB_Android</string>
+    <string name="loading">加载中…</string>
+    <string name="load_complete">加载完成</string>
+    <string name="load_error">无法连接服务器</string>
+    <string name="retry">重试</string>
+    <string name="data_empty">暂无记录</string>
+
+    <string name="confirm_ok">确定</string>
+    <string name="confirm_cancel">取消</string>
+    <string name="confirm_yes">是</string>
+    <string name="confirm_no">否</string>
+</resources>
