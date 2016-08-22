@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.mzba.pokemon.R;
 import com.mzba.pokemon.adapter.PokemonAdapter;
@@ -52,6 +54,19 @@ public class MainActivity extends BasicActivity {
     }
 
     @Override
+    protected boolean initMenu(Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void initListener() {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -69,7 +84,8 @@ public class MainActivity extends BasicActivity {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
-        mPresenter = (MainPresenter) WorkProxy.proxy(new MainPresenter(this, new MainModel()));
+        mPresenter = new MainPresenter(this, new MainModel());
+        WorkProxy.proxy(mPresenter);
         mPresenter.load(IPresenter.INIT_DATA);
     }
 
@@ -82,6 +98,7 @@ public class MainActivity extends BasicActivity {
                 mPokemonEntities.clear();
                 mPokemonEntities.addAll(pokemonEntities);
                 mAdapter.notifyDataSetChanged();
+                mRefreshLayout.setRefreshing(false);
             }
         } else if (action.equals(MainPresenter.GETDATA_BYPAGE)) {
             if (object != null) {

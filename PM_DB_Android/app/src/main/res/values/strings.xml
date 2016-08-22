@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PM_DB_Android</string>
+    <string name="app_name">宝可梦百科</string>
     <string name="loading">加载中…</string>
     <string name="load_complete">加载完成</string>
     <string name="load_error">无法连接服务器</string>

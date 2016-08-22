@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextThemeWrapper;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -51,6 +52,11 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return initMenu(menu);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }
@@ -71,6 +77,8 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
     protected abstract void initListener();
 
     protected abstract void initData(Bundle savedInstanceState);
+
+    protected abstract boolean initMenu(Menu menu);
 
     public void initToolbar() {
         if (mToolbar != null) {

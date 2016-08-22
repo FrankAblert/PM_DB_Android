@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="invisible"
+    app:cardBackgroundColor="@color/window_background"
     app:cardCornerRadius="0dp">
 
     <LinearLayout
@@ -33,6 +34,7 @@
             android:textStyle="bold"
             android:layout_margin="10dp"
             android:textSize="16sp"
+            android:textColor="@color/pm_item_name"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -42,6 +44,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
+            android:textColor="@color/pm_item_description"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
 
