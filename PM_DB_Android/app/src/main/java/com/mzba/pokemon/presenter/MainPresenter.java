@@ -1,6 +1,7 @@
 package com.mzba.pokemon.presenter;
 
 import com.mzba.pokemon.model.IModel;
+import com.mzba.pokemon.param.MainParam;
 import com.mzba.pokemon.view.IView;
 
 /**
@@ -18,8 +19,8 @@ public class MainPresenter implements IPresenter {
     }
 
     @Override
-    public void load() {
-        Object object = mModel.get(null);
-        mView.updateUI(object);
+    public void load(String action) {
+        Object object = mModel.get(new MainParam());
+        mView.updateUI(action, object);
     }
 }

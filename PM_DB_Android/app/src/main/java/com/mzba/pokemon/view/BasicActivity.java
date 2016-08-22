@@ -201,7 +201,7 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
     }
 
     @Override
-    public void updateUI(Object object) {
+    public void updateUI(String action, Object object) {
 
     }
 }

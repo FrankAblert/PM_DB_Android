@@ -60,12 +60,12 @@ public class MainActivity extends BasicActivity {
     @Override
     protected void initData(Bundle savedInstanceState) {
         mPresenter = (IPresenter) WorkProxy.proxy(new MainPresenter(this, new MainModel()));
-        mPresenter.load();
+        mPresenter.load(IPresenter.INIT_DATA);
     }
 
 
     @Override
-    public void updateUI(Object object) {
+    public void updateUI(String action, Object object) {
 
     }
 }
