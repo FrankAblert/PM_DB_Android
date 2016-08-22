@@ -42,11 +42,10 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
             mRootView = contentView;
             setContentView(contentView);
         }
-
-        initView(paramBundle);
-        initListener();
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         initToolbar();
+        initView(paramBundle);
+        initListener();
         initBroadcast();
         initData(paramBundle);
     }

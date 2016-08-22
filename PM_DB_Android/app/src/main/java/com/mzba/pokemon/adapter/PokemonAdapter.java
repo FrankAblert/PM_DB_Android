@@ -1,13 +1,16 @@
 package com.mzba.pokemon.adapter;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.mzba.pokemon.R;
 import com.mzba.pokemon.entity.PokemonEntity;
-import com.mzba.pokemon.util.ImageDownloader;
+import com.mzba.pokemon.widget.RatioImageView;
 
 import java.util.List;
 
@@ -25,24 +28,44 @@ public class PokemonAdapter extends CommonRecyclerViewAdapter<PokemonEntity> {
 
     @Override
     public RecyclerViewAdapterItem initAdapterItem(ViewGroup viewGroup, int type) {
-        return new PokemonViewItem(mContext, viewGroup, R.layout.support_simple_spinner_dropdown_item);
+        return new PokemonViewItem(mContext, viewGroup, R.layout.pm_item);
     }
 
     public class PokemonViewItem extends RecyclerViewAdapterItem<PokemonEntity> {
 
-        ImageView imageView;
+        View cardView;
+        RatioImageView imageView;
         TextView nameTv;
+        TextView descriptionTv;
 
         public PokemonViewItem(Context context, ViewGroup viewGroup, int layoutResId) {
             super(context, viewGroup, layoutResId);
-            imageView = (ImageView) getView(0);
-            nameTv = (TextView) getView(0);
+            imageView = getView(R.id.iv_pm_image);
+            imageView.setOriginalSize(50, 50);
+            nameTv = getView(R.id.tv_pm_name);
+            descriptionTv = getView(R.id.tv_pm_description);
+            cardView = getView(R.id.card_pm);
         }
 
         @Override
         public void initViews(PokemonEntity data, int position) {
             nameTv.setText(data.getName());
-            ImageDownloader.getInstance().displayImage(mContext, data.getImage(), imageView, 100, 100, 0);
+            descriptionTv.setText(data.getDescription());
+            Glide.with(mContext)
+                    .load(data.getImage())
+                    .crossFade()
+                    .fitCenter()
+                    .placeholder(R.color.cardview_light_background)
+                    .dontAnimate()
+                    .into(imageView)
+                    .getSize(new SizeReadyCallback() {
+                        @Override
+                        public void onSizeReady(int width, int height) {
+                            if (!cardView.isShown()) {
+                                cardView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
         }
     }
 }

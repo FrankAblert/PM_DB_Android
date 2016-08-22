@@ -21,6 +21,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.mzba.pokemon.R;
 import com.mzba.pokemon.view.BasicActivity;
@@ -76,7 +77,13 @@ public class ImageDownloader {
                 .centerCrop()
                 .placeholder(placeHolder)
                 .dontAnimate()
-                .into(imageView);
+                .into(imageView)
+                .getSize(new SizeReadyCallback() {
+                @Override
+                public void onSizeReady(int width, int height) {
+
+                }
+            });
     }
 
     @SuppressLint("NewApi")
