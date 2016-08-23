@@ -53,6 +53,10 @@ public class MainPresenter implements IPresenter {
         }
     }
 
+    public ArrayList<String> getRecentKeywords() {
+        return mModel.getRecentKeywords();
+    }
+
     public void setIsLoading(boolean isLoading) {
         this.mIsLoading = isLoading;
     }

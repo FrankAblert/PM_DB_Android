@@ -10,6 +10,11 @@ import java.util.ArrayList;
  * Created by 06peng on 16/8/19.
  */
 public class MainModel implements IModel {
+
+    /**
+     *
+     * 获取前20条数据，相当于刷新
+     */
     @Override
     public Object get(BasicParam param) {
         ArrayList<PokemonEntity> pokemonEntities = new ArrayList<>();
@@ -85,8 +90,19 @@ public class MainModel implements IModel {
      * @return
      */
     public ArrayList<PokemonEntity> searchPokemons(String keyword) {
+        //搜索的时候需要判断 本地最近是否已经保存了当前这个关键字，如果没有，要保存
         ArrayList<PokemonEntity> pokemonEntities = new ArrayList<>();
         //TODO
         return pokemonEntities;
+    }
+
+    /**
+     *
+     * @return 获取搜索历史的关键字
+     */
+    public ArrayList<String> getRecentKeywords() {
+        ArrayList<String> keywordEntities = new ArrayList<>();
+        //TODO
+        return keywordEntities;
     }
 }

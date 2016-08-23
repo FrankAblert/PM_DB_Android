@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_search"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:visibility="invisible"
+    card_view:cardBackgroundColor="@color/window_background"
+    card_view:cardCornerRadius="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/linearLayout_search"
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
+
+            <ImageView
+                android:id="@+id/image_search_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="12dp"
+                android:src="@mipmap/ic_back_dark" />
+
+            <EditText
+                android:id="@+id/edit_text_search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#fff"
+                android:gravity="center_vertical"
+                android:hint="@string/menu_search"
+                android:textColor="@color/pm_item_name"
+                android:textColorHint="@color/pm_item_description"
+                android:imeOptions="actionSearch"
+                android:inputType="textCapWords"
+                android:paddingLeft="12dp"
+                android:paddingRight="8dp"
+                android:singleLine="true" />
+
+            <ImageView
+                android:id="@+id/clearSearch"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="12dp"
+                android:src="@drawable/abc_ic_voice_search_api_mtrl_alpha" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/line_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/linearLayout_search"
+            android:background="#eee" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/line_divider"
+            android:divider="@color/window_background" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
