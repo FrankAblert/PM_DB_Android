@@ -52,15 +52,15 @@ public class MainActivity extends BasicActivity {
     private ArrayList<PokemonEntity> mPokemonEntities = new ArrayList<>();
     private ArrayList<String> mQuickSearchEntities = new ArrayList<>();
 
-    private InitiateSearch initiateSearch;
+    private InitiateSearch mInitiateSearch;
 
-    private View line_divider;
-    private RelativeLayout view_search;
-    private CardView card_search;
-    private ImageView image_search_back, clearSearch;
-    private EditText edit_text_search;
-    private ListView listView;
-    private ProgressBar marker_progress;
+    private View mLineDivider;
+    private RelativeLayout mBackgroundRL;
+    private CardView mCardSearchView;
+    private ImageView mSearchBackIV, mSearchClearIV;
+    private EditText mSearchKeywordET;
+    private ListView mRecentListView;
+    private ProgressBar mLoadProgressBar;
 
     @Override
     protected int provideLayoutResId() {
@@ -82,19 +82,19 @@ public class MainActivity extends BasicActivity {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        initiateSearch = new InitiateSearch();
-        view_search = (RelativeLayout) findViewById(R.id.view_search);
-        line_divider = findViewById(R.id.line_divider);
-        edit_text_search = (EditText) findViewById(R.id.edit_text_search);
-        card_search = (CardView) findViewById(R.id.card_search);
-        image_search_back = (ImageView) findViewById(R.id.image_search_back);
-        clearSearch = (ImageView) findViewById(R.id.clearSearch);
-        listView = (ListView) findViewById(R.id.listView);
-        marker_progress = (ProgressBar) findViewById(R.id.marker_progress);
-        marker_progress.getIndeterminateDrawable().setColorFilter(Color.parseColor("#FFFFFF"),//Pink color
+        mInitiateSearch = new InitiateSearch();
+        mBackgroundRL = (RelativeLayout) findViewById(R.id.view_search);
+        mLineDivider = findViewById(R.id.line_divider);
+        mSearchKeywordET = (EditText) findViewById(R.id.edit_text_search);
+        mCardSearchView = (CardView) findViewById(R.id.card_search);
+        mSearchBackIV = (ImageView) findViewById(R.id.image_search_back);
+        mSearchClearIV = (ImageView) findViewById(R.id.clearSearch);
+        mRecentListView = (ListView) findViewById(R.id.listView);
+        mLoadProgressBar = (ProgressBar) findViewById(R.id.marker_progress);
+        mLoadProgressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor("#FFFFFF"),//Pink color
                 android.graphics.PorterDuff.Mode.MULTIPLY);
         mQuickSearchArrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, android.R.id.text1, mQuickSearchEntities);
-        listView.setAdapter(mQuickSearchArrayAdapter);
+        mRecentListView.setAdapter(mQuickSearchArrayAdapter);
         IsAdapterEmpty();
     }
 
@@ -109,8 +109,8 @@ public class MainActivity extends BasicActivity {
         switch (item.getItemId()) {
             case R.id.menu_search:
                 IsAdapterEmpty();
-                initiateSearch.handleToolBar(MainActivity.this, card_search, mToolbar, view_search,
-                        listView, edit_text_search, line_divider);
+                mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL,
+                        mRecentListView, mSearchKeywordET, mLineDivider);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -131,14 +131,14 @@ public class MainActivity extends BasicActivity {
             }
         }));
         //清除搜索
-        clearSearch.setOnClickListener(new View.OnClickListener() {
+        mSearchClearIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (edit_text_search.getText().toString().length() == 0) {
+                if (mSearchKeywordET.getText().toString().length() == 0) {
 
                 } else {
-                    edit_text_search.setText("");
-                    listView.setVisibility(View.VISIBLE);
+                    mSearchKeywordET.setText("");
+                    mRecentListView.setVisibility(View.VISIBLE);
                     clearItems();
                     ((InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                     IsAdapterEmpty();
@@ -146,39 +146,39 @@ public class MainActivity extends BasicActivity {
             }
         });
         //返回
-        image_search_back.setOnClickListener(new View.OnClickListener() {
+        mSearchBackIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initiateSearch.handleToolBar(MainActivity.this, card_search, mToolbar, view_search, listView, edit_text_search, line_divider);
+                mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL, mRecentListView, mSearchKeywordET, mLineDivider);
                 mPresenter.load(IPresenter.INIT_DATA);
             }
         });
-        edit_text_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mSearchKeywordET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    if (edit_text_search.getText().toString().trim().length() > 0) {
+                    if (mSearchKeywordET.getText().toString().trim().length() > 0) {
                         clearItems();
-                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(edit_text_search.getWindowToken(), 0);
-                        listView.setVisibility(View.GONE);
-                        mPresenter.search(edit_text_search.getText().toString());
+                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mSearchKeywordET.getWindowToken(), 0);
+                        mRecentListView.setVisibility(View.GONE);
+                        mPresenter.search(mSearchKeywordET.getText().toString());
                     }
                     return true;
                 }
                 return false;
             }
         });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mRecentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String keyword = mQuickSearchArrayAdapter.getItem(position);
-                edit_text_search.setText(keyword);
-                listView.setVisibility(View.GONE);
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(edit_text_search.getWindowToken(), 0);
-                mPresenter.search(edit_text_search.getText().toString());
+                mSearchKeywordET.setText(keyword);
+                mRecentListView.setVisibility(View.GONE);
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mSearchKeywordET.getWindowToken(), 0);
+                mPresenter.search(mSearchKeywordET.getText().toString());
             }
         });
-        edit_text_search.addTextChangedListener(new TextWatcher() {
+        mSearchKeywordET.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -186,17 +186,17 @@ public class MainActivity extends BasicActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (edit_text_search.getText().toString().length() == 0) {
+                if (mSearchKeywordET.getText().toString().length() == 0) {
                     mQuickSearchEntities.clear();
                     mQuickSearchArrayAdapter.notifyDataSetChanged();
-                    clearSearch.setImageResource(R.drawable.abc_ic_voice_search_api_mtrl_alpha);
+                    mSearchClearIV.setImageResource(R.drawable.abc_ic_voice_search_api_mtrl_alpha);
                     IsAdapterEmpty();
                 } else {
                     ArrayList<String> recentValues = mPresenter.getRecentKeywords();
                     mQuickSearchEntities.clear();
                     mQuickSearchEntities.addAll(recentValues);
                     mQuickSearchArrayAdapter.notifyDataSetChanged();
-                    clearSearch.setImageResource(R.mipmap.ic_cancel_dark);
+                    mSearchClearIV.setImageResource(R.mipmap.ic_cancel_dark);
                     IsAdapterEmpty();
                 }
             }
@@ -206,10 +206,10 @@ public class MainActivity extends BasicActivity {
 
             }
         });
-        view_search.setOnClickListener(new View.OnClickListener() {
+        mBackgroundRL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initiateSearch.handleToolBar(MainActivity.this, card_search, mToolbar, view_search, listView, edit_text_search, line_divider);
+                mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL, mRecentListView, mSearchKeywordET, mLineDivider);
                 mPresenter.load(IPresenter.INIT_DATA);
             }
         });
@@ -222,9 +222,9 @@ public class MainActivity extends BasicActivity {
 
     private void IsAdapterEmpty() {
         if (mQuickSearchArrayAdapter.getCount() == 0) {
-            line_divider.setVisibility(View.GONE);
+            mLineDivider.setVisibility(View.GONE);
         } else {
-            line_divider.setVisibility(View.VISIBLE);
+            mLineDivider.setVisibility(View.VISIBLE);
         }
     }
 
@@ -257,7 +257,7 @@ public class MainActivity extends BasicActivity {
                 mAdapter.notifyDataSetChanged();
             }
         } else if (action.equals(MainPresenter.SEARCH)) {
-            marker_progress.setVisibility(View.GONE);
+            mLoadProgressBar.setVisibility(View.GONE);
             ArrayList<PokemonEntity> pokemonEntities = (ArrayList<PokemonEntity>) object;
             mPokemonEntities.clear();
             mPokemonEntities.addAll(pokemonEntities);
