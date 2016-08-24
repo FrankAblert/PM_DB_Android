@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.mzba.pokemon.R;
 import com.mzba.pokemon.adapter.BaseRecyclerViewAdapter;
+import com.mzba.pokemon.util.SqlUtil;
 
 /**
  * @author 06peng
@@ -45,7 +46,7 @@ public class CustomRecyclerScrollListener extends RecyclerView.OnScrollListener 
         int totalItemCount = layoutManager.getItemCount();
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
             if (visibleItemCount > 0  && lastVisibleItemPosition >= totalItemCount - 1 &&
-                    totalItemCount >= 20) {
+                    totalItemCount >= SqlUtil.SIZECOUNT) {
                 if (listener != null && isOnLoadEnable && mScrollPosition <= lastVisibleItemPosition) {
                     startLoad();
                     listener.onload();
@@ -159,5 +160,6 @@ public class CustomRecyclerScrollListener extends RecyclerView.OnScrollListener 
 
     public void setOnLoadEnable(boolean isOnLoadEnable) {
         this.isOnLoadEnable = isOnLoadEnable;
+        setOnLoadComplete();
     }
 }

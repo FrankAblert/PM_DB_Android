@@ -5,7 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.mzba.pokemon.entity.BasicEntity;
-import com.mzba.pokemon.widget.CustomAnimationView;
+import com.mzba.pokemon.util.SqlUtil;
+import com.mzba.pokemon.widget.CustomFooterView;
 
 import java.util.List;
 
@@ -48,8 +49,10 @@ public abstract class CommonRecyclerViewAdapter<T extends BasicEntity> extends B
 
     @Override
     public void onBindFooterHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if (viewHolder.itemView instanceof CustomAnimationView) {
-            ((CustomAnimationView) viewHolder.itemView).startLoad();
+        if (viewHolder.itemView instanceof CustomFooterView) {
+            if (position >= SqlUtil.SIZECOUNT) {
+                ((CustomFooterView) viewHolder.itemView).startLoad();
+            }
         }
     }
 

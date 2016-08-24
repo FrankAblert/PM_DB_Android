@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
@@ -86,6 +88,15 @@ public class Utils {
         BitmapFactory.decodeFile(path, options);
         String type = options.outMimeType;
         MediaScannerConnection.scanFile(context, new String[]{path}, new String[]{type}, null);
+    }
+
+    public static boolean isKeyboardShown(View rootView) {
+        final int softKeyboardHeight = 100;
+        Rect r = new Rect();
+        rootView.getWindowVisibleDisplayFrame(r);
+        DisplayMetrics dm = rootView.getResources().getDisplayMetrics();
+        int heightDiff = rootView.getBottom() - r.bottom;
+        return heightDiff > softKeyboardHeight * dm.density;
     }
 
 }

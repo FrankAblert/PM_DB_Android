@@ -22,7 +22,7 @@ import com.mzba.pokemon.R;
  */
 public class InitiateSearch {
     public void handleToolBar(final Context context, final CardView search, Toolbar toolbarMain, final View view,
-                                     final ListView listView, final EditText editText, final View line_divider) {
+                                     final ListView listView, final EditText editText) {
         final Animation fade_in = AnimationUtils.loadAnimation(context.getApplicationContext(), android.R.anim.fade_in);
         final Animation fade_out = AnimationUtils.loadAnimation(context.getApplicationContext(), android.R.anim.fade_out);
         if (search.getVisibility() == View.VISIBLE) {
@@ -128,6 +128,7 @@ public class InitiateSearch {
                 listView.setVisibility(View.VISIBLE);
                 ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
             }
+            editText.requestFocus();
         }
     }
 

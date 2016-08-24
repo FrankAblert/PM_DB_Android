@@ -3,13 +3,13 @@ package com.mzba.pokemon.adapter;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.mzba.pokemon.R;
 import com.mzba.pokemon.entity.PokemonEntity;
+import com.mzba.pokemon.widget.CustomFooterView;
 import com.mzba.pokemon.widget.RatioImageView;
 
 import java.util.List;
@@ -24,6 +24,7 @@ public class PokemonAdapter extends CommonRecyclerViewAdapter<PokemonEntity> {
     public PokemonAdapter(Context context, List<PokemonEntity> data) {
         super(context, data);
         mContext = context;
+        addFooterView(new CustomFooterView(context));
     }
 
     @Override

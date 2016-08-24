@@ -32,6 +32,7 @@ import com.mzba.pokemon.presenter.IPresenter;
 import com.mzba.pokemon.presenter.MainPresenter;
 import com.mzba.pokemon.util.InitiateSearch;
 import com.mzba.pokemon.widget.CustomRecyclerScrollListener;
+import com.mzba.pokemon.widget.GridSpanSizeLookup;
 import com.mzba.pokemon.widget.HotFixRecyclerView;
 import com.mzba.pokemon.widget.SpaceGridItemDecoration;
 
@@ -39,15 +40,18 @@ import java.util.ArrayList;
 
 import cn.tobeing.pxandroid.proxy.WorkProxy;
 
+/**
+ * 主界面
+ */
 public class MainActivity extends BasicActivity {
 
     private MainPresenter mPresenter;
     private PokemonAdapter mAdapter;
     private ArrayAdapter<String> mQuickSearchArrayAdapter;
 
-
     private SwipeRefreshLayout mRefreshLayout;
     private HotFixRecyclerView mRecyclerView;
+    private CustomRecyclerScrollListener mRecyclerScrollListener;
 
     private ArrayList<PokemonEntity> mPokemonEntities = new ArrayList<>();
     private ArrayList<String> mQuickSearchEntities = new ArrayList<>();
@@ -61,6 +65,15 @@ public class MainActivity extends BasicActivity {
     private EditText mSearchKeywordET;
     private ListView mRecentListView;
     private ProgressBar mLoadProgressBar;
+
+    /**
+     * 是否有搜索操作，结束搜索之后要重新获取搜索之前的数据
+     */
+    private boolean mIsListChanged;
+    /**
+     * 搜索之前要记录当前的位置，以便恢复数据使用
+     */
+    private int mCurrentPosition;
 
     @Override
     protected int provideLayoutResId() {
@@ -80,6 +93,7 @@ public class MainActivity extends BasicActivity {
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setSpanSizeLookup(new GridSpanSizeLookup(mRecyclerView, 2));
         mRecyclerView.setLayoutManager(layoutManager);
 
         mInitiateSearch = new InitiateSearch();
@@ -93,9 +107,10 @@ public class MainActivity extends BasicActivity {
         mLoadProgressBar = (ProgressBar) findViewById(R.id.marker_progress);
         mLoadProgressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor("#FFFFFF"),//Pink color
                 android.graphics.PorterDuff.Mode.MULTIPLY);
-        mQuickSearchArrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, android.R.id.text1, mQuickSearchEntities);
+        mQuickSearchArrayAdapter = new ArrayAdapter<>(this, R.layout.recent_search_item,
+                R.id.tv_rs_keword, mQuickSearchEntities);
         mRecentListView.setAdapter(mQuickSearchArrayAdapter);
-        IsAdapterEmpty();
+        setListViewLineDividerVisibile();
     }
 
     @Override
@@ -108,9 +123,9 @@ public class MainActivity extends BasicActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_search:
-                IsAdapterEmpty();
+                setListViewLineDividerVisibile();
                 mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL,
-                        mRecentListView, mSearchKeywordET, mLineDivider);
+                        mRecentListView, mSearchKeywordET);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -121,15 +136,17 @@ public class MainActivity extends BasicActivity {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mCurrentPosition = 0;
                 mPresenter.load(IPresenter.INIT_DATA);
             }
         });
-        mRecyclerView.addOnScrollListener(new CustomRecyclerScrollListener(mRecyclerView, new CustomRecyclerScrollListener.onLoadListener() {
+        mRecyclerScrollListener = new CustomRecyclerScrollListener(mRecyclerView, new CustomRecyclerScrollListener.onLoadListener() {
             @Override
             public void onload() {
                 mPresenter.loadMore();
             }
-        }));
+        });
+        mRecyclerView.addOnScrollListener(mRecyclerScrollListener);
         //清除搜索
         mSearchClearIV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,9 +156,9 @@ public class MainActivity extends BasicActivity {
                 } else {
                     mSearchKeywordET.setText("");
                     mRecentListView.setVisibility(View.VISIBLE);
-                    clearItems();
-                    ((InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-                    IsAdapterEmpty();
+                    ((InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE)).
+                            toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    setListViewLineDividerVisibile();
                 }
             }
         });
@@ -149,8 +166,7 @@ public class MainActivity extends BasicActivity {
         mSearchBackIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL, mRecentListView, mSearchKeywordET, mLineDivider);
-                mPresenter.load(IPresenter.INIT_DATA);
+                recoveryData();
             }
         });
         mSearchKeywordET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -158,10 +174,11 @@ public class MainActivity extends BasicActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (mSearchKeywordET.getText().toString().trim().length() > 0) {
-                        clearItems();
-                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mSearchKeywordET.getWindowToken(), 0);
+                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                                hideSoftInputFromWindow(mSearchKeywordET.getWindowToken(), 0);
                         mRecentListView.setVisibility(View.GONE);
-                        mPresenter.search(mSearchKeywordET.getText().toString());
+                        mLoadProgressBar.setVisibility(View.VISIBLE);
+                        search(mSearchKeywordET.getText().toString());
                     }
                     return true;
                 }
@@ -173,9 +190,11 @@ public class MainActivity extends BasicActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String keyword = mQuickSearchArrayAdapter.getItem(position);
                 mSearchKeywordET.setText(keyword);
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                        hideSoftInputFromWindow(mSearchKeywordET.getWindowToken(), 0);
+                mLoadProgressBar.setVisibility(View.VISIBLE);
                 mRecentListView.setVisibility(View.GONE);
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mSearchKeywordET.getWindowToken(), 0);
-                mPresenter.search(mSearchKeywordET.getText().toString());
+                search(mSearchKeywordET.getText().toString());
             }
         });
         mSearchKeywordET.addTextChangedListener(new TextWatcher() {
@@ -190,14 +209,15 @@ public class MainActivity extends BasicActivity {
                     mQuickSearchEntities.clear();
                     mQuickSearchArrayAdapter.notifyDataSetChanged();
                     mSearchClearIV.setImageResource(R.drawable.abc_ic_voice_search_api_mtrl_alpha);
-                    IsAdapterEmpty();
+                    setListViewLineDividerVisibile();
                 } else {
+                    mRecentListView.setVisibility(View.VISIBLE);
                     ArrayList<String> recentValues = mPresenter.getRecentKeywords();
                     mQuickSearchEntities.clear();
                     mQuickSearchEntities.addAll(recentValues);
                     mQuickSearchArrayAdapter.notifyDataSetChanged();
                     mSearchClearIV.setImageResource(R.mipmap.ic_cancel_dark);
-                    IsAdapterEmpty();
+                    setListViewLineDividerVisibile();
                 }
             }
 
@@ -209,18 +229,33 @@ public class MainActivity extends BasicActivity {
         mBackgroundRL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL, mRecentListView, mSearchKeywordET, mLineDivider);
-                mPresenter.load(IPresenter.INIT_DATA);
+                recoveryData();
             }
         });
+//        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+//        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                if (isClickedBackKey && !Utils.isKeyboardShown(rootView)) {
+//                    mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL,
+//                            mRecentListView, mSearchKeywordET, mLineDivider);
+//                    mPresenter.getCurrentList();
+//                }
+//            }
+//        });
     }
+
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (mCardSearchView.getVisibility() == View.VISIBLE) {
+            recoveryData();
+        } else {
+            super.onBackPressed();
+        }
     }
 
-    private void IsAdapterEmpty() {
+    private void setListViewLineDividerVisibile() {
         if (mQuickSearchArrayAdapter.getCount() == 0) {
             mLineDivider.setVisibility(View.GONE);
         } else {
@@ -228,9 +263,17 @@ public class MainActivity extends BasicActivity {
         }
     }
 
-    private void clearItems() {
-        mPokemonEntities.clear();
-        mAdapter.notifyDataSetChanged();
+    private void recoveryData() {
+        mInitiateSearch.handleToolBar(MainActivity.this, mCardSearchView, mToolbar, mBackgroundRL,
+                mRecentListView, mSearchKeywordET);
+        if (mIsListChanged) {
+            mPresenter.getCurrentList();
+        }
+    }
+
+    private void search(String keyword) {
+        mCurrentPosition = mRecyclerScrollListener.getLastVisibleItemPosition(mRecyclerView);
+        mPresenter.search(keyword);
     }
 
     @Override
@@ -249,14 +292,27 @@ public class MainActivity extends BasicActivity {
                 mPokemonEntities.addAll(pokemonEntities);
                 mAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
+                if (mCurrentPosition > 0) {
+                    mRecyclerView.scrollToPosition(mCurrentPosition);
+                }
+                if (pokemonEntities.size() < 20) {
+                    mRecyclerScrollListener.setOnLoadEnable(false);
+                }
             }
+            mIsListChanged = false;
         } else if (action.equals(MainPresenter.GETDATA_BYPAGE)) {
             if (object != null) {
                 ArrayList<PokemonEntity> pokemonEntities = (ArrayList<PokemonEntity>) object;
                 mPokemonEntities.addAll(pokemonEntities);
                 mAdapter.notifyDataSetChanged();
+                if (pokemonEntities.size() < 20) {
+                    mRecyclerScrollListener.setOnLoadEnable(false);
+                }
             }
+            mIsListChanged = false;
+            mRecyclerScrollListener.setOnLoadComplete();
         } else if (action.equals(MainPresenter.SEARCH)) {
+            mIsListChanged = true;
             mLoadProgressBar.setVisibility(View.GONE);
             ArrayList<PokemonEntity> pokemonEntities = (ArrayList<PokemonEntity>) object;
             mPokemonEntities.clear();

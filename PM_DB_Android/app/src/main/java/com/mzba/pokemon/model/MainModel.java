@@ -102,6 +102,11 @@ public class MainModel implements IModel {
      */
     public ArrayList<String> getRecentKeywords() {
         ArrayList<String> keywordEntities = new ArrayList<>();
+        keywordEntities.add("test1");
+        keywordEntities.add("test2");
+        keywordEntities.add("test3");
+        keywordEntities.add("test4");
+        keywordEntities.add("test5");
         //TODO
         return keywordEntities;
     }

@@ -5,6 +5,8 @@ package com.mzba.pokemon.util;
  */
 public class SqlUtil {
 
+    public static final int SIZECOUNT = 20;
+
     public static String CREATE_TABLE_SQL = "CREATE TABLE `pokemon_list_cn_tb` (\n" +
             "  `id` int(4) NOT NULL AUTO_INCREMENT,\n" +
             "  `name` varchar(32) DEFAULT NULL COMMENT '名字',\n" +

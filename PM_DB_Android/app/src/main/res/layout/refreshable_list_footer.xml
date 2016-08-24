@@ -13,6 +13,7 @@
         android:layout_centerInParent="true"
         android:layout_margin="10dp"
         android:background="@color/colorAccent"
+        android:visibility="invisible"
         android:gravity="center" />
 
     <TextView
@@ -21,5 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
+        android:textColor="@color/pm_item_name"
+        android:text="@string/load_complete"
         android:padding="10dp" />
 </RelativeLayout>
