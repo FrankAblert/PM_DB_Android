@@ -4,7 +4,7 @@
 不过目前的缺陷是暂时没有使用线程池。
 
 
-![](https://github.com/06peng/PM_DB_Android/screenshots/screenshot01.png)
+![](https://github.com/06peng/PM_DB_Android/tree/master/screenshots/screenshot01.png)
 
 
 # License
