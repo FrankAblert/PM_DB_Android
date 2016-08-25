@@ -1,5 +1,8 @@
 # PM_DB_Android
 
+使用MVP开发框架，结合Tobeingcn的[PxAndroid](https://github.com/Tobeingcn/PxAndroid)主要是用来解决UI线程和子线程的切换问题，内部实现是动态代理＋Handler。
+不过目前的缺陷是暂时没有使用线程池。
+
 
 
 
