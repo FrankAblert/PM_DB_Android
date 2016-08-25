@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <declare-styleable name="RatioImageView">
-        <attr name="ratioHeigh" format="float" />
-        <attr name="ratioWidth" format="float" />
-    </declare-styleable>
-</resources>
